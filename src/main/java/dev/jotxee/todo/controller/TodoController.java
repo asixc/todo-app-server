@@ -51,15 +51,14 @@ public class TodoController {
 
     @PostMapping("/{id}/mark-done")
     public Todo markTodoDone(@PathVariable Long id) throws IOException {
-        todoService.markTodoAsDone(id);  // Marcar como hecho
+        todoService.markTodoAsDone(id);
         webSocketHandler.broadcastMessage("Todo marcado como hecho: " + id);  // Notificar por WebSocket
         return todoService.findById(id);
     }
 
-    // Endpoint para marcar un Todo como no hecho
     @PostMapping("/{id}/mark-undone")
     public Todo markTodoUndone(@PathVariable Long id) throws IOException {
-        todoService.markTodoAsUndone(id);  // Marcar como no hecho
+        todoService.markTodoAsUndone(id);
         webSocketHandler.broadcastMessage("Todo marcado como no hecho: " + id);  // Notificar por WebSocket
         return todoService.findById(id);
     }
