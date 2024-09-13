@@ -34,3 +34,5 @@ build/
 
 # .gitignore
 .env
+application.properties.bk
+datos-postgres
