@@ -5,12 +5,7 @@ import dev.jotxee.todo.entities.TodoItemEntity;
 
 public class TodoMapper {
     public static TodoItemEntity toEntity(Todo todo) {
-        return TodoItemEntity.builder()
-                .id(todo.id())
-                .name(todo.name())
-                .done(todo.done())
-                .quantity(todo.quantity())
-                .build();
+        return new TodoItemEntity(todo.id(), todo.name(), todo.done(), todo.quantity());
     }
 
     public static Todo toDto(TodoItemEntity entity) {

@@ -7,17 +7,19 @@ import dev.jotxee.todo.exception.EntityWithOutChangesException;
 import dev.jotxee.todo.mapper.TodoMapper;
 import dev.jotxee.todo.repository.TodoRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static java.lang.String.format;
 
-@Slf4j
 @Service
 public class TodoService {
+
+    private static final Logger log = LoggerFactory.getLogger(TodoService.class);
 
     public static final String ITEM_NOT_FOUND_MSG = "El item con el id %s no existe.";
     private final TodoRepository todoRepository;
@@ -34,7 +36,7 @@ public class TodoService {
         });
 
         log.info("Item no existe, creando nuevo item");
-        todoRepository.save(TodoItemEntity.builder().name(todo.name().trim()).build());
+        todoRepository.save(TodoItemEntity.withName(todo.name().trim()));
     }
 
     public List<Todo> getTodos() {
