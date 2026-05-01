@@ -73,15 +73,9 @@
 				<version>${hibernate.version}</version>
 				<executions>
 					<execution>
-						<id>enhance</id>
 						<goals>
 							<goal>enhance</goal>
 						</goals>
-						<configuration>
-							<enableLazyInitialization>true</enableLazyInitialization>
-							<enableDirtyTracking>true</enableDirtyTracking>
-							<enableAssociationManagement>true</enableAssociationManagement>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
