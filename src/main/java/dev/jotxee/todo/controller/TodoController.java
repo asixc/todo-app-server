@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("api/v1/todo")
+@RequestMapping("/api/v1/todo")
 public class TodoController {
 
     private final TodoService todoService;
