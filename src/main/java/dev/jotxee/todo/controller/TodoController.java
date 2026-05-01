@@ -2,6 +2,7 @@ package dev.jotxee.todo.controller;
 
 import dev.jotxee.todo.dto.Todo;
 import dev.jotxee.todo.service.TodoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class TodoController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public void createTodo(@RequestBody Todo todo) throws IOException {
         todoService.createTodo(todo);
         webSocketHandler.broadcastMessage("Nuevo Todo creado: " + todo.name());
