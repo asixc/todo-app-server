@@ -1,6 +1,6 @@
 services:
   postgresdb-api:
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: api-postgres-db
     healthcheck:
       test: [ "CMD", "pg_isready" ]
@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./datos-postgres:/var/lib/postgresql/data
+      - ./datos-postgres:/var/lib/postgresql
   todo-app-native:
     image: todo-app:0.0.2-SNAPSHOT
     container_name: todo-app-native
