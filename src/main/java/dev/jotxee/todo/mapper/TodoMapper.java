@@ -9,7 +9,7 @@ public class TodoMapper {
     }
 
     public static TodoItemEntity toEntity(Todo todo) {
-        return new TodoItemEntity(todo.id(), todo.name(), todo.done(), todo.quantity());
+        return new TodoItemEntity(todo.id(), todo.name(), Boolean.TRUE.equals(todo.done()), todo.quantity());
     }
 
     public static Todo toDto(TodoItemEntity entity) {
