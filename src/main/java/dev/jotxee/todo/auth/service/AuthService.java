@@ -47,9 +47,9 @@ public class AuthService {
     public void requestOtp(String email) {
         allowedUserRepository.findByEmailAndActiveTrue(email)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Email no autorizado"));
+                        HttpStatus.FORBIDDEN, "Email not authorized"));
 
-        // Invalidar OTPs anteriores del mismo email
+                // Invalidate previous OTPs for the same email
         otpTokenRepository.deleteAllByEmail(email);
 
         String otp = generateOtp();
@@ -68,7 +68,7 @@ public class AuthService {
                 .findTopByEmailAndOtpAndUsedFalseAndExpiresAtAfterOrderByIdDesc(
                         email, otp, LocalDateTime.now())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "OTP inválido o expirado"));
+                        HttpStatus.UNAUTHORIZED, "Invalid or expired OTP"));
 
         otpToken.setUsed(true);
         otpTokenRepository.save(otpToken);
@@ -90,12 +90,12 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenRepository
                 .findByTokenAndRevokedFalseAndExpiresAtAfter(rawToken, LocalDateTime.now())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Refresh token inválido o expirado"));
+                        HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token"));
 
-        // Verificar que el usuario sigue en la whitelist
+        // Verify the user is still in the whitelist
         allowedUserRepository.findByEmailAndActiveTrue(refreshToken.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Usuario no autorizado"));
+                        HttpStatus.FORBIDDEN, "User not authorized"));
 
         return jwtService.generateAccessToken(refreshToken.getEmail());
     }

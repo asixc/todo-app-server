@@ -21,7 +21,7 @@ public class TodoService {
 
     private static final Logger log = LoggerFactory.getLogger(TodoService.class);
 
-    public static final String ITEM_NOT_FOUND_MSG = "El item con el id %s no existe.";
+    public static final String ITEM_NOT_FOUND_MSG = "Item with id %s not found.";
     private final TodoRepository todoRepository;
 
     public TodoService(TodoRepository todoRepository) {
@@ -29,13 +29,12 @@ public class TodoService {
     }
 
     public void createTodo(Todo todo) {
-        log.info("Creating: {}", todo);
-        // Verificar si ya existe un item con el mismo nombre
+        log.info("Creating todo: {}", todo);
         todoRepository.findByNameIgnoreCase(todo.name()).ifPresent(_ -> {
-            throw new EntityAlreadyExistsException("El item con el nombre '" + todo.name() + "' ya existe.");
+            throw new EntityAlreadyExistsException("Item with name '" + todo.name() + "' already exists.");
         });
 
-        log.info("Saving new todo: {}", todo);
+        log.info("Saving new todo: {}", todo.name());
         todoRepository.save(TodoItemEntity.withName(todo.name().trim()));
     }
 
@@ -46,7 +45,7 @@ public class TodoService {
     }
 
     public Todo updateTodo(Long id, Todo todo) {
-        log.info("Updating todo with id: {}", todo);
+        log.info("Updating todo id={}: {}", id, todo);
         boolean changed = false;
         TodoItemEntity entity = todoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(format(ITEM_NOT_FOUND_MSG, id)));
@@ -59,13 +58,13 @@ public class TodoService {
             changed = true;
         }
         if (!changed) {
-            throw new EntityWithOutChangesException(format("El item con el id %s no ha sido actualizado.", id));
+            throw new EntityWithOutChangesException(format("Item with id %s has no changes to update.", id));
         }
         return TodoMapper.toDto(todoRepository.save(entity));
     }
 
     public void deleteTodo(Long id) {
-        log.info("Deleting TODO with id: {}", id);
+        log.info("Deleting todo id={}", id);
         todoRepository.deleteById(id);
     }
 
@@ -82,7 +81,7 @@ public class TodoService {
     }
 
     public void toggleTodoDone(Long id) {
-        log.info("Toggling done for todo with id: {}", id);
+        log.info("Toggling done state for todo id={}", id);
         TodoItemEntity entity = todoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(format(ITEM_NOT_FOUND_MSG, id)));
         entity.setDone(!entity.isDone());

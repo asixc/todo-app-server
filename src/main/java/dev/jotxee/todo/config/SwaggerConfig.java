@@ -26,11 +26,11 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("TODO API")
-                        .description("Documentación de API de Todo App")
+                        .description("Todo App API documentation")
                         .version(appVersion))
                 .servers(List.of(new Server().url(baseUrl)))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Documentación completa")
+                        .description("Full API documentation")
                         .url(baseUrl + "/swagger-ui.html"))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer"))
                 .components(new Components()

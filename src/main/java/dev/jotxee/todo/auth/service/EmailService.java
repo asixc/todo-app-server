@@ -24,13 +24,13 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailFrom);
         message.setTo(toEmail);
-        message.setSubject("Tu código de acceso");
+        message.setSubject("Your access code");
         message.setText("""
-                Tu código de acceso es: %s
+                Your access code is: %s
                 
-                Este código expira en 10 minutos.
+                This code expires in 10 minutes.
                 
-                Si no solicitaste este código, ignora este mensaje.
+                If you did not request this code, please ignore this message.
                 """.formatted(otp));
         mailSender.send(message);
     }

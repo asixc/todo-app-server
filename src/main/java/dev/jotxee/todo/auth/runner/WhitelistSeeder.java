@@ -34,7 +34,7 @@ public class WhitelistSeeder implements ApplicationRunner {
                 .forEach(email -> {
                     if (!allowedUserRepository.existsByEmail(email)) {
                         allowedUserRepository.save(new AllowedUser(email, null));
-                        System.out.println("[WhitelistSeeder] Usuario añadido: " + email);
+                        System.out.println("[WhitelistSeeder] User added: " + email);
                     }
                 });
     }

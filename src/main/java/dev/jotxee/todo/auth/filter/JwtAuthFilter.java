@@ -42,16 +42,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (!jwtService.isValid(token)) {
-            writeError(response, HttpStatus.UNAUTHORIZED, "Token inválido o expirado");
+            writeError(response, HttpStatus.UNAUTHORIZED, "Invalid or expired token");
             return;
         }
 
         String email = jwtService.extractEmail(token);
 
-        // Verificar que el usuario sigue activo en la whitelist
+        // Verify the user is still active in the whitelist
         boolean isActive = allowedUserRepository.findByEmailAndActiveTrue(email).isPresent();
         if (!isActive) {
-            writeError(response, HttpStatus.FORBIDDEN, "Usuario no autorizado");
+            writeError(response, HttpStatus.FORBIDDEN, "User not authorized");
             return;
         }
 
