@@ -45,7 +45,7 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:*}
   mail-from: ${MAIL_FROM:info@full4media.com}
   secure-cookie: false
-  version: ${APP_VERSION:0.2.2}
+  version: ${APP_VERSION:0.2.4}
 
 management:
   endpoints:
@@ -65,7 +65,7 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-      version: ${APP_VERSION:0.2.2}
+      version: ${APP_VERSION:0.2.4}
 
 jwt:
   secret: ${JWT_SECRET}
