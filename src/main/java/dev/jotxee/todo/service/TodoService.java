@@ -35,7 +35,7 @@ public class TodoService {
             throw new EntityAlreadyExistsException("El item con el nombre '" + todo.name() + "' ya existe.");
         });
 
-        log.info("Item no existe, creando nuevo item");
+        log.info("Saving new todo: {}", todo);
         todoRepository.save(TodoItemEntity.withName(todo.name().trim()));
     }
 

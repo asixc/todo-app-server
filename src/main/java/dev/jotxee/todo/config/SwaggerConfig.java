@@ -19,12 +19,15 @@ public class SwaggerConfig {
     @Value("${swagger.base-url}")
     private String baseUrl;
 
+    @Value("${app.version:unknown}")
+    private String appVersion;
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("TODO API")
                         .description("Documentación de API de Todo App")
-                        .version("v1.0"))
+                        .version(appVersion))
                 .servers(List.of(new Server().url(baseUrl)))
                 .externalDocs(new ExternalDocumentation()
                         .description("Documentación completa")

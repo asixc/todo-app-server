@@ -32,7 +32,7 @@ spring:
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
-        debug: true
+#        debug: true
         smtp:
           auth: true
           starttls:
@@ -45,6 +45,27 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:*}
   mail-from: ${MAIL_FROM:info@full4media.com}
   secure-cookie: false
+  version: ${APP_VERSION:0.2.2}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      version: ${APP_VERSION:0.2.2}
 
 jwt:
   secret: ${JWT_SECRET}
