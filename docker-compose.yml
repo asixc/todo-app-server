@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
   todo-app-native:
-    image: todo-app:0.2.3-native
+    image: todo-app:0.2.4-native
     container_name: todo-app-native
     env_file:
       - .env

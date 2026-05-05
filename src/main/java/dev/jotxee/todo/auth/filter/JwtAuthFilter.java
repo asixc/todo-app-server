@@ -6,6 +6,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (!jwtService.isValid(token)) {
-            filterChain.doFilter(request, response);
+            writeError(response, HttpStatus.UNAUTHORIZED, "Token inválido o expirado");
             return;
         }
 
@@ -49,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Verificar que el usuario sigue activo en la whitelist
         boolean isActive = allowedUserRepository.findByEmailAndActiveTrue(email).isPresent();
         if (!isActive) {
-            filterChain.doFilter(request, response);
+            writeError(response, HttpStatus.FORBIDDEN, "Usuario no autorizado");
             return;
         }
 
@@ -60,5 +62,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
+    }
+
+    private void writeError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+                "{\"status\":" + status.value() + ",\"error\":\"" + message + "\"}");
     }
 }
