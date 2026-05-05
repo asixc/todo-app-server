@@ -28,7 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
-		<jjwt.version>0.12.6</jjwt.version>
+		<jjwt.version>0.13.0</jjwt.version>
+		<postgresql.version>42.7.11</postgresql.version>
 	</properties>
 
 	<dependencies>
@@ -139,8 +140,9 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.graalvm.buildtools</groupId>
-						<artifactId>native-maven-plugin</artifactId>
+				<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>native-maven-plugin</artifactId>
+					<version>0.10.6</version>
 						<executions>
 							<execution>
 								<id>build-native</id>
