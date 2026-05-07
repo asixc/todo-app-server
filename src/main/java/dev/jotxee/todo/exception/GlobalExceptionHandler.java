@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -14,6 +15,13 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException e) {
+        log.info("ResponseStatusException [{}]: {}", e.getStatusCode().value(), e.getReason());
+        return ResponseEntity.status(e.getStatusCode())
+                .body(Map.of("error", e.getReason() != null ? e.getReason() : "Error"));
+    }
 
     @ExceptionHandler({EntityNotFoundException.class, EntityAlreadyExistsException.class, EntityWithOutChangesException.class})
     public ResponseEntity<Map<String, String>> handleBusinessException(RuntimeException e) {

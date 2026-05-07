@@ -47,7 +47,7 @@ public class AuthService {
     public void requestOtp(String email) {
         allowedUserRepository.findByEmailAndActiveTrue(email)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Email not authorized"));
+                        HttpStatus.BAD_REQUEST, "Invalid request"));
 
                 // Invalidate previous OTPs for the same email
         otpTokenRepository.deleteAllByEmail(email);
