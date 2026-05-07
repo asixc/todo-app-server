@@ -143,6 +143,12 @@
 				<groupId>org.graalvm.buildtools</groupId>
 					<artifactId>native-maven-plugin</artifactId>
 					<version>0.10.6</version>
+						<configuration>
+							<buildArgs>
+								<buildArg>-Dorg.jboss.logging.provider=slf4j</buildArg>
+								<buildArg>--initialize-at-build-time=org.jboss.logging</buildArg>
+							</buildArgs>
+						</configuration>
 						<executions>
 							<execution>
 								<id>build-native</id>
