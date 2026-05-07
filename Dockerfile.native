@@ -1,0 +1,16 @@
+FROM debian:bookworm-slim
+
+RUN groupadd -r -g 101 appgroup && \
+    useradd -r -u 100 -g appgroup appuser && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY target/todo-app /app/todo-app
+RUN chown appuser:appgroup /app/todo-app && chmod +x /app/todo-app
+
+ENV TZ="Europe/Madrid"
+USER appuser
+EXPOSE 8080
+
+ENTRYPOINT ["/app/todo-app"]

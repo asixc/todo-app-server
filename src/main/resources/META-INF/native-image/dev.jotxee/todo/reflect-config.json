@@ -1,0 +1,51 @@
+[
+  {
+    "name": "io.jsonwebtoken.impl.security.KeysBridge",
+    "allPublicMethods": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.DefaultJwtBuilder",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.DefaultJwtParserBuilder",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.DefaultClaims",
+    "allPublicMethods": true,
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.DefaultJwsHeader",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.security.DefaultMacAlgorithm",
+    "allPublicMethods": true,
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.security.StandardSecureDigestAlgorithms",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.io.StandardSerializers",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "io.jsonwebtoken.impl.io.StandardDeserializers",
+    "allPublicMethods": true,
+    "allPublicConstructors": true
+  }
+]
