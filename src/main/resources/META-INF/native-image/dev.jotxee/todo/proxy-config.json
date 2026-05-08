@@ -1,0 +1,4 @@
+[
+  ["org.hibernate.jpa.internal.JpaLogger"],
+  ["org.hibernate.internal.CoreMessageLogger"]
+]
