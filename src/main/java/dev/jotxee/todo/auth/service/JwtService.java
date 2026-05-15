@@ -41,7 +41,7 @@ public class JwtService {
         try {
             Claims claims = parseClaims(token);
             return claims.getExpiration().after(new Date());
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }

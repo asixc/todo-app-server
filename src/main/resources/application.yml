@@ -72,6 +72,10 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION:900}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800}
 
+rate-limit:
+  capacity: ${RATE_LIMIT_CAPACITY:5}
+  refill-minutes: ${RATE_LIMIT_REFILL_MINUTES:1}
+
 swagger:
   base-url: "http://localhost:8080"
 
