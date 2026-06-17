@@ -55,14 +55,12 @@ public class TodoController {
     }
 
     @PostMapping("/{id}/mark-done")
-    public Todo markTodoDone(@PathVariable Long id) {
+    public void markTodoDone(@PathVariable Long id) {
         todoService.markTodoAsDone(id);
-        return todoService.findById(id);
     }
 
     @PostMapping("/{id}/mark-undone")
-    public Todo markTodoUndone(@PathVariable Long id) {
+    public void markTodoUndone(@PathVariable Long id) {
         todoService.markTodoAsUndone(id);
-        return todoService.findById(id);
     }
 }
