@@ -1,7 +1,7 @@
 package dev.jotxee.todo.auth.filter;
 
+import dev.jotxee.todo.auth.service.AllowedUserService;
 import dev.jotxee.todo.auth.service.JwtService;
-import dev.jotxee.todo.repository.AllowedUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,11 +21,11 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final AllowedUserRepository allowedUserRepository;
+    private final AllowedUserService allowedUserService;
 
-    public JwtAuthFilter(JwtService jwtService, AllowedUserRepository allowedUserRepository) {
+    public JwtAuthFilter(JwtService jwtService, AllowedUserService allowedUserService) {
         this.jwtService = jwtService;
-        this.allowedUserRepository = allowedUserRepository;
+        this.allowedUserService = allowedUserService;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String email = jwtService.extractEmail(token);
 
         // Verify the user is still active in the whitelist
-        boolean isActive = allowedUserRepository.findByEmailAndActiveTrue(email).isPresent();
+        boolean isActive = allowedUserService.isActive(email);
         if (!isActive) {
             writeError(response, HttpStatus.FORBIDDEN, "User not authorized");
             return;

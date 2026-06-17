@@ -2,7 +2,6 @@ package dev.jotxee.todo.auth.service;
 
 import dev.jotxee.todo.entities.OtpToken;
 import dev.jotxee.todo.entities.RefreshToken;
-import dev.jotxee.todo.repository.AllowedUserRepository;
 import dev.jotxee.todo.repository.OtpTokenRepository;
 import dev.jotxee.todo.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +20,7 @@ public class AuthService {
     private static final int OTP_EXPIRATION_MINUTES = 10;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final AllowedUserRepository allowedUserRepository;
+    private final AllowedUserService allowedUserService;
     private final OtpTokenRepository otpTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
@@ -29,13 +28,13 @@ public class AuthService {
     private final long refreshExpirationSeconds;
 
     public AuthService(
-            AllowedUserRepository allowedUserRepository,
+            AllowedUserService allowedUserService,
             OtpTokenRepository otpTokenRepository,
             RefreshTokenRepository refreshTokenRepository,
             JwtService jwtService,
             EmailService emailService,
             @Value("${jwt.refresh-expiration}") long refreshExpirationSeconds) {
-        this.allowedUserRepository = allowedUserRepository;
+        this.allowedUserService = allowedUserService;
         this.otpTokenRepository = otpTokenRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
@@ -45,11 +44,11 @@ public class AuthService {
 
     @Transactional
     public void requestOtp(String email) {
-        allowedUserRepository.findByEmailAndActiveTrue(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Invalid request"));
+        if (!allowedUserService.isActive(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
+        }
 
-                // Invalidate previous OTPs for the same email
+        // Invalidate previous OTPs for the same email
         otpTokenRepository.deleteAllByEmail(email);
 
         String otp = generateOtp();
@@ -93,9 +92,9 @@ public class AuthService {
                         HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token"));
 
         // Verify the user is still in the whitelist
-        allowedUserRepository.findByEmailAndActiveTrue(refreshToken.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "User not authorized"));
+        if (!allowedUserService.isActive(refreshToken.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
+        }
 
         return jwtService.generateAccessToken(refreshToken.getEmail());
     }

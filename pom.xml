@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.jotxee</groupId>
 	<artifactId>todo-app</artifactId>
-	<version>0.2.9</version>
+	<version>0.2.10</version>
 	<name>todo-app</name>
 	<description>TODO app</description>
 	<url/>
@@ -53,6 +53,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
@@ -62,6 +66,10 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
 		</dependency>
 
 		<!-- JWT -->

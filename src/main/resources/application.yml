@@ -46,6 +46,10 @@ app:
   mail-from: ${MAIL_FROM:info@full4media.com}
   secure-cookie: false
   version: ${APP_VERSION:0.2.5}
+  cache:
+    whitelist:
+      ttl: ${WHITELIST_CACHE_TTL:PT60S}
+      maximum-size: ${WHITELIST_CACHE_MAX_SIZE:1000}
 
 management:
   endpoints:
