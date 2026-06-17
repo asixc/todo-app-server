@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class JwtService {
@@ -33,17 +34,16 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmail(String token) {
-        return parseClaims(token).getSubject();
-    }
-
-    public boolean isValid(String token) {
+    public Optional<String> extractValidEmail(String token) {
         try {
             Claims claims = parseClaims(token);
-            return claims.getExpiration().after(new Date());
+            if (claims.getExpiration().after(new Date())) {
+                return Optional.ofNullable(claims.getSubject());
+            }
         } catch (Exception _) {
-            return false;
+            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     private Claims parseClaims(String token) {

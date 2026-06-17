@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -41,12 +42,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!jwtService.isValid(token)) {
+        Optional<String> validEmail = jwtService.extractValidEmail(token);
+        if (validEmail.isEmpty()) {
             writeError(response, HttpStatus.UNAUTHORIZED, "Invalid or expired token");
             return;
         }
 
-        String email = jwtService.extractEmail(token);
+        String email = validEmail.get();
 
         // Verify the user is still active in the whitelist
         boolean isActive = allowedUserService.isActive(email);
