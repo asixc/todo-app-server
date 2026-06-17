@@ -12,7 +12,7 @@ jobs:
       contents: write
     env:
       REGISTRY: registry.full4media.com
-      IMAGE_NAME: todo-app-server
+      IMAGE_NAME: apps/todo-app-server
     steps:
       - name: Checkout
         uses: actions/checkout@v4
