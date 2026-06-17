@@ -10,17 +10,13 @@ env:
   IMAGE_NAME: apps/todo-app-server
 
 jobs:
-  build:
-    name: Build, scan and report
+  image:
+    name: Build, scan, push and update deployment
     runs-on: ubuntu-latest
     permissions:
       contents: write
       security-events: write
       actions: read
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      short_sha: ${{ steps.version.outputs.short_sha }}
-      image_tag: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,7 +42,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image (no push)
+      - name: Build image (local, no push)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -54,15 +50,22 @@ jobs:
           push: false
           load: true
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          tags: localhost:5000/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Start local Docker registry
+        run: |
+          docker run -d -p 5000:5000 --restart=always --name registry registry:2
+          sleep 5
+          docker tag localhost:5000/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
 
       - name: Run Trivy vulnerability scanner (table)
         id: trivy-table
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          image-ref: localhost:5000/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
           format: 'table'
           output: 'trivy-report.txt'
           ignore-unfixed: true
@@ -72,24 +75,34 @@ jobs:
       - name: Generate Trivy SARIF report
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          image-ref: localhost:5000/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
           format: 'sarif'
           output: 'trivy-report.sarif'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
           exit-code: '0'
 
-      - name: Upload Trivy table report
-        uses: actions/upload-artifact@v4
+      - name: Block if CRITICAL vulnerabilities
         if: always()
+        run: |
+          if grep -q "│         CRITICAL" trivy-report.txt 2>/dev/null; then
+            echo "ERROR: CRITICAL vulnerabilities found. Blocking push."
+            cat trivy-report.txt
+            exit 1
+          fi
+          echo "No CRITICAL vulnerabilities. Push allowed."
+
+      - name: Upload Trivy table report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-report-${{ steps.version.outputs.version }}
           path: trivy-report.txt
           retention-days: 30
 
       - name: Upload Trivy SARIF report
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-sarif-${{ steps.version.outputs.version }}
           path: trivy-report.sarif
@@ -102,37 +115,16 @@ jobs:
           sarif_file: trivy-report.sarif
           category: trivy-image-scan
 
-      - name: Block if CRITICAL vulnerabilities
-        if: always()
-        run: |
-          if grep -q "│         CRITICAL" trivy-report.txt 2>/dev/null; then
-            echo "ERROR: CRITICAL vulnerabilities found. Blocking push."
-            cat trivy-report.txt
-            exit 1
-          fi
-          echo "No CRITICAL vulnerabilities. Push allowed."
-
-  push:
-    name: Push image and update deployment
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Login to Zot registry
+        if: success()
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push image
+      - name: Push image to Zot
+        if: success()
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -140,19 +132,20 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ needs.build.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ steps.version.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Update gitops-config deployment
+        if: success()
         env:
           GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
         run: |
           set -euo pipefail
-          VERSION="${{ needs.build.outputs.version }}"
-          SHORT_SHA="${{ needs.build.outputs.short_sha }}"
+          VERSION="${{ steps.version.outputs.version }}"
+          SHORT_SHA="${{ steps.version.outputs.short_sha }}"
           IMAGE="registry.full4media.com/apps/todo-app-server:${VERSION}"
           git clone "https://x-access-token:${GITOPS_TOKEN}@github.com/asixc/gitops-config.git" /tmp/gitops
           cd /tmp/gitops
