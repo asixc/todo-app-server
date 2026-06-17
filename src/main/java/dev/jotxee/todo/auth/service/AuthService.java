@@ -27,6 +27,9 @@ public class AuthService {
     private final EmailService emailService;
     private final long refreshExpirationSeconds;
 
+    public record VerifiedOtpSession(String accessToken, RefreshToken refreshToken) {
+    }
+
     public AuthService(
             AllowedUserService allowedUserService,
             OtpTokenRepository otpTokenRepository,
@@ -62,7 +65,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String verifyOtp(String email, String otp) {
+    public VerifiedOtpSession verifyOtpAndCreateRefreshToken(String email, String otp) {
         OtpToken otpToken = otpTokenRepository
                 .findTopByEmailAndOtpAndUsedFalseAndExpiresAtAfterOrderByIdDesc(
                         email, otp, LocalDateTime.now())
@@ -72,16 +75,12 @@ public class AuthService {
         otpToken.setUsed(true);
         otpTokenRepository.save(otpToken);
 
-        return jwtService.generateAccessToken(email);
-    }
-
-    @Transactional
-    public RefreshToken createRefreshToken(String email) {
+        String accessToken = jwtService.generateAccessToken(email);
         RefreshToken refreshToken = new RefreshToken(
                 email,
                 UUID.randomUUID().toString(),
                 LocalDateTime.now().plusSeconds(refreshExpirationSeconds));
-        return refreshTokenRepository.save(refreshToken);
+        return new VerifiedOtpSession(accessToken, refreshTokenRepository.save(refreshToken));
     }
 
     @Transactional

@@ -4,7 +4,6 @@ import dev.jotxee.todo.auth.dto.AuthResponseDto;
 import dev.jotxee.todo.auth.dto.OtpRequestDto;
 import dev.jotxee.todo.auth.dto.OtpVerifyDto;
 import dev.jotxee.todo.auth.service.AuthService;
-import dev.jotxee.todo.entities.RefreshToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,15 +42,14 @@ public class AuthController {
             @RequestBody OtpVerifyDto dto,
             HttpServletResponse response) {
 
-        String accessToken = authService.verifyOtp(dto.email(), dto.otp());
-        RefreshToken refreshToken = authService.createRefreshToken(dto.email());
+        AuthService.VerifiedOtpSession session = authService.verifyOtpAndCreateRefreshToken(dto.email(), dto.otp());
 
-        setRefreshCookie(response, refreshToken.getToken(),
-                (int) refreshToken.getExpiresAt()
+        setRefreshCookie(response, session.refreshToken().getToken(),
+                (int) session.refreshToken().getExpiresAt()
                         .atZone(java.time.ZoneId.systemDefault())
                         .toEpochSecond() - (int) (System.currentTimeMillis() / 1000));
 
-        return ResponseEntity.ok(new AuthResponseDto(accessToken));
+        return ResponseEntity.ok(new AuthResponseDto(session.accessToken()));
     }
 
     @PostMapping("/refresh")

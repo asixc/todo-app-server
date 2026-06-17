@@ -69,7 +69,7 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-      version: ${APP_VERSION:0.2.5}
+      version: ${APP_VERSION:0.2.11}
 
 jwt:
   secret: ${JWT_SECRET}
