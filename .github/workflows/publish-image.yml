@@ -133,7 +133,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ steps.version.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}-${{ steps.version.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -146,7 +146,8 @@ jobs:
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
           SHORT_SHA="${{ steps.version.outputs.short_sha }}"
-          IMAGE="registry.full4media.com/apps/todo-app-server:${VERSION}"
+          VERSION_SHA_TAG="${VERSION}-${SHORT_SHA}"
+          IMAGE="registry.full4media.com/apps/todo-app-server:${VERSION_SHA_TAG}"
           git clone "https://x-access-token:${GITOPS_TOKEN}@github.com/asixc/gitops-config.git" /tmp/gitops
           cd /tmp/gitops
           sed -i "s|image: registry.full4media.com/apps/todo-app-server:.*|image: ${IMAGE}|" \
