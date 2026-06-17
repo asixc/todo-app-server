@@ -64,7 +64,7 @@ public class TodoService {
     }
 
     public void deleteTodo(Long id) {
-        log.info("Deleting todo id={}", id);
+        log.info("Deleting todo id={}, element={}", id, todoRepository.findById(id).orElse(null));
         todoRepository.deleteById(id);
     }
 

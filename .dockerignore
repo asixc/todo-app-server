@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.agents
+datos-postgres
+effective-pom.xml
+skills-lock.json
+src
+*.md
+*.sh
+docker-compose.yml
+Dockerfile.native
+target/*
+!target/*.jar
