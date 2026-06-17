@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,18 +18,15 @@ public class TodoController {
     private static final Logger log = LoggerFactory.getLogger(TodoController.class);
 
     private final TodoService todoService;
-    private final TodoWebSocketHandler webSocketHandler;
 
-    public TodoController(TodoService todoService, TodoWebSocketHandler webSocketHandler) {
+    public TodoController(TodoService todoService) {
         this.todoService = todoService;
-        this.webSocketHandler = webSocketHandler;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createTodo(@RequestBody Todo todo) throws IOException {
+    public void createTodo(@RequestBody Todo todo) {
         todoService.createTodo(todo);
-        webSocketHandler.broadcastMessage("Nuevo Todo creado: " + todo.name());
     }
 
     @GetMapping
@@ -39,21 +35,18 @@ public class TodoController {
     }
 
     @PutMapping("/{id}")
-    public Todo updateTodo(@PathVariable Long id, @RequestBody Todo todo) throws IOException {
-        var updatedTodo = todoService.updateTodo(id, todo);
-        webSocketHandler.broadcastMessage("Todo actualizado: " + todo.name());
-        return updatedTodo;
+    public Todo updateTodo(@PathVariable Long id, @RequestBody Todo todo) {
+        return todoService.updateTodo(id, todo);
     }
 
     @DeleteMapping("/{id}")
     public void deleteTodo(@PathVariable Long id,
-                           @AuthenticationPrincipal String email) throws IOException {
+                           @AuthenticationPrincipal String email) {
         log.atInfo()
                 .addArgument(() -> LogMask.partial(email))
                 .addArgument(id)
                 .log("Delete requested by={} for todo id={}");
         todoService.deleteTodo(id);
-        webSocketHandler.broadcastMessage("Todo eliminado con ID: " + id);
     }
 
     @GetMapping("/find")
@@ -62,16 +55,14 @@ public class TodoController {
     }
 
     @PostMapping("/{id}/mark-done")
-    public Todo markTodoDone(@PathVariable Long id) throws IOException {
+    public Todo markTodoDone(@PathVariable Long id) {
         todoService.markTodoAsDone(id);
-        webSocketHandler.broadcastMessage("Todo marcado como hecho: " + id);  // Notificar por WebSocket
         return todoService.findById(id);
     }
 
     @PostMapping("/{id}/mark-undone")
-    public Todo markTodoUndone(@PathVariable Long id) throws IOException {
+    public Todo markTodoUndone(@PathVariable Long id) {
         todoService.markTodoAsUndone(id);
-        webSocketHandler.broadcastMessage("Todo marcado como no hecho: " + id);  // Notificar por WebSocket
         return todoService.findById(id);
     }
 }

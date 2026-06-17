@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.jotxee</groupId>
 	<artifactId>todo-app</artifactId>
-	<version>0.2.7</version>
+	<version>0.2.8</version>
 	<name>todo-app</name>
 	<description>TODO app</description>
 	<url/>
@@ -40,10 +40,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-websocket</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
