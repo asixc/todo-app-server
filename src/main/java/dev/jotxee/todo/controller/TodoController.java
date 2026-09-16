@@ -1,6 +1,7 @@
 package dev.jotxee.todo.controller;
 
 import dev.jotxee.todo.dto.Todo;
+import dev.jotxee.todo.dto.QuantityUpdateRequest;
 import dev.jotxee.todo.service.TodoService;
 import dev.jotxee.todo.util.LogMask;
 import org.slf4j.Logger;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -25,7 +28,7 @@ public class TodoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createTodo(@RequestBody Todo todo) {
+    public void createTodo(@Valid @RequestBody Todo todo) {
         todoService.createTodo(todo);
     }
 
@@ -35,8 +38,14 @@ public class TodoController {
     }
 
     @PutMapping("/{id}")
-    public Todo updateTodo(@PathVariable Long id, @RequestBody Todo todo) {
+    public Todo updateTodo(@PathVariable Long id, @Valid @RequestBody Todo todo) {
         return todoService.updateTodo(id, todo);
+    }
+
+    @PatchMapping("/{id}/quantity")
+    public Todo updateTodoQuantity(@PathVariable Long id,
+                                   @Valid @RequestBody QuantityUpdateRequest request) {
+        return todoService.updateQuantity(id, request.quantity());
     }
 
     @DeleteMapping("/{id}")

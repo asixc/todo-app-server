@@ -1,12 +1,14 @@
 package dev.jotxee.todo.service;
 
 import dev.jotxee.todo.dto.Todo;
+import dev.jotxee.todo.dto.Quantity;
 import dev.jotxee.todo.entities.TodoItemEntity;
 import dev.jotxee.todo.exception.EntityAlreadyExistsException;
 import dev.jotxee.todo.exception.EntityWithOutChangesException;
 import dev.jotxee.todo.mapper.TodoMapper;
 import dev.jotxee.todo.repository.TodoRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,9 @@ public class TodoService {
         });
 
         log.info("Saving new todo: {}", todo.name());
-        todoRepository.save(TodoItemEntity.withName(todo.name().trim()));
+        TodoItemEntity entity = TodoItemEntity.withName(todo.name().trim());
+        entity.setQuantity(todo.quantity());
+        todoRepository.save(entity);
     }
 
     public List<Todo> getTodos() {
@@ -60,6 +64,14 @@ public class TodoService {
         if (!changed) {
             throw new EntityWithOutChangesException(format("Item with id %s has no changes to update.", id));
         }
+        return TodoMapper.toDto(todoRepository.save(entity));
+    }
+
+    @Transactional
+    public Todo updateQuantity(Long id, Quantity quantity) {
+        TodoItemEntity entity = todoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(format(ITEM_NOT_FOUND_MSG, id)));
+        entity.setQuantity(quantity);
         return TodoMapper.toDto(todoRepository.save(entity));
     }
 

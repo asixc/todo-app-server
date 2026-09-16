@@ -23,8 +23,12 @@ spring:
     open-in-view: false
   sql:
     init:
-      mode: always
-      schema-locations: 'classpath:schema.sql'
+      mode: never
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: 'classpath:db/migration'
   mail:
     host: ${MAIL_HOST:smtp.servidor-correo.net}
     port: ${MAIL_PORT:587}
@@ -43,6 +47,8 @@ spring:
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:*}
+  cors:
+    enabled: false
   mail-from: ${MAIL_FROM:info@full4media.com}
   secure-cookie: false
   version: ${APP_VERSION:0.2.5}
@@ -98,5 +104,7 @@ swagger:
 
 app:
   frontend-url: "https://todo.full4media.com"
+  cors:
+    enabled: true
   mail-from: ${MAIL_FROM}
   secure-cookie: true

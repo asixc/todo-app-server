@@ -1,5 +1,6 @@
 package dev.jotxee.todo.entities;
 
+import dev.jotxee.todo.dto.Quantity;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -13,15 +14,16 @@ public class TodoItemEntity {
     private Long id;
     private String name;
     private boolean done;
-    private Long quantity;
+    @Embedded
+    private QuantityValue quantity;
 
     public TodoItemEntity() {}
 
-    public TodoItemEntity(Long id, String name, boolean done, Long quantity) {
+    public TodoItemEntity(Long id, String name, boolean done, Quantity quantity) {
         this.id = id;
         this.name = name;
         this.done = done;
-        this.quantity = quantity;
+        this.setQuantity(quantity);
     }
 
     public static TodoItemEntity withName(String name) {
@@ -39,8 +41,16 @@ public class TodoItemEntity {
     public boolean isDone() { return done; }
     public void setDone(boolean done) { this.done = done; }
 
-    public Long getQuantity() { return quantity; }
-    public void setQuantity(Long quantity) { this.quantity = quantity; }
+    public Quantity getQuantity() {
+        if (quantity == null || quantity.getValue() == null || quantity.getUnit() == null) {
+            return null;
+        }
+        return new Quantity(quantity.getValue(), quantity.getUnit());
+    }
+
+    public void setQuantity(Quantity quantity) {
+        this.quantity = quantity == null ? null : QuantityValue.of(quantity.value(), quantity.unit());
+    }
 
     @Override
     public boolean equals(Object o) {
