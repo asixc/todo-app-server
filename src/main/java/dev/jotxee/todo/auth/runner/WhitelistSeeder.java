@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @Component
 public class WhitelistSeeder implements ApplicationRunner {
@@ -32,9 +33,10 @@ public class WhitelistSeeder implements ApplicationRunner {
                 .map(String::trim)
                 .filter(email -> !email.isBlank())
                 .forEach(email -> {
-                    if (!allowedUserRepository.existsByEmail(email)) {
-                        allowedUserRepository.save(new AllowedUser(email, null));
-                        System.out.println("[WhitelistSeeder] User added: " + email);
+                    String normalizedEmail = email.toLowerCase(Locale.ROOT);
+                    if (!allowedUserRepository.existsByEmail(normalizedEmail)) {
+                        allowedUserRepository.save(new AllowedUser(normalizedEmail, null));
+                        System.out.println("[WhitelistSeeder] User added: " + normalizedEmail);
                     }
                 });
     }

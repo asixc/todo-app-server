@@ -1,3 +1,9 @@
 package dev.jotxee.todo.auth.dto;
 
-public record OtpVerifyDto(String email, String otp) {}
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
+public record OtpVerifyDto(
+        @NotBlank @Email String email,
+        @NotBlank @Pattern(regexp = "\\d{6}") String otp) {}

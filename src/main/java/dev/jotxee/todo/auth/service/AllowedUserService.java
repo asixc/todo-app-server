@@ -19,6 +19,6 @@ public class AllowedUserService {
     @Cacheable(cacheNames = ACTIVE_USERS_CACHE, key = "#email")
     @Transactional(readOnly = true)
     public boolean isActive(String email) {
-        return allowedUserRepository.findByEmailAndActiveTrue(email).isPresent();
+        return allowedUserRepository.findByEmailIgnoreCaseAndActiveTrue(email).isPresent();
     }
 }

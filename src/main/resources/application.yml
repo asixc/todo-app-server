@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
   compression:
     enabled: true
 
@@ -51,6 +52,8 @@ app:
     enabled: false
   mail-from: ${MAIL_FROM:info@full4media.com}
   secure-cookie: false
+  docs:
+    enabled: ${APP_DOCS_ENABLED:true}
   version: ${APP_VERSION:0.2.5}
   cache:
     whitelist:
@@ -81,6 +84,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION:900}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800}
+  session-max-expiration: ${JWT_SESSION_MAX_EXPIRATION:7776000}
 
 rate-limit:
   capacity: ${RATE_LIMIT_CAPACITY:5}
@@ -89,18 +93,26 @@ rate-limit:
 swagger:
   base-url: "http://localhost:8080"
 
+springdoc:
+  api-docs:
+    enabled: ${APP_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${APP_DOCS_ENABLED:true}
+
 ---
 spring:
   config:
     activate:
       on-profile: "prod"
-  datasource:
-    url: jdbc:postgresql://api-postgres-db:5432/postgres
-    username: ${POSTGRES_API_USER}
-    password: ${POSTGRES_API_PASSWORD}
 
 swagger:
-  base-url: "https://api.casa.full4media.com"
+  base-url: "https://api.todo.full4media.com"
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 app:
   frontend-url: "https://todo.full4media.com"
@@ -108,3 +120,5 @@ app:
     enabled: true
   mail-from: ${MAIL_FROM}
   secure-cookie: true
+  docs:
+    enabled: false

@@ -1,5 +1,7 @@
 package dev.jotxee.todo.auth.filter;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
@@ -15,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -26,7 +28,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             "/api/v1/auth/refresh"
     );
 
-    private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
+            .maximumSize(10_000)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build();
     private final int capacity;
     private final int refillMinutes;
 
@@ -46,8 +51,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String ip = resolveClientIp(request);
-        Bucket bucket = buckets.computeIfAbsent(ip, this::newBucket);
+        String ip = request.getRemoteAddr();
+        Bucket bucket = buckets.get(ip, this::newBucket);
 
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
@@ -66,13 +71,5 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 .refillGreedy(capacity, Duration.ofMinutes(refillMinutes))
                 .build();
         return Bucket.builder().addLimit(limit).build();
-    }
-
-    private String resolveClientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].strip();
-        }
-        return request.getRemoteAddr();
     }
 }

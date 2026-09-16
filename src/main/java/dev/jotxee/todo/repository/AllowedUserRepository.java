@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AllowedUserRepository extends JpaRepository<AllowedUser, Long> {
-    Optional<AllowedUser> findByEmailAndActiveTrue(String email);
+    Optional<AllowedUser> findByEmailIgnoreCaseAndActiveTrue(String email);
     boolean existsByEmail(String email);
 }
